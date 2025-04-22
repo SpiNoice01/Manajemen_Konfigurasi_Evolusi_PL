@@ -61,16 +61,42 @@ public class LibraryMember {
     private ActivityStats activityStats;
     private MemberPreferences memberPreferences;
 
-    public LibraryMember(String namaLengkap, String alamat, String nomorTelepon, String email, String jenisKelamin,
-            String kodeAnggota, Date tanggalGabung, boolean statusAktif,
-            String tingkatKeanggotaan, int jumlahBukuDipinjam,
-            int jumlahTerlambat, int jumlahDenda, int poinLoyalitas,
-            String kodeReferal, boolean langgananBuletin) {
+    private LibraryMember(Builder builder) {
+        this.personalInfo = builder.personalInfo;
+        this.membershipInfo = builder.membershipInfo;
+        this.activityStats = builder.activityStats;
+        this.memberPreferences = builder.memberPreferences;
+    }
 
-        this.personalInfo = new PersonalInfo(namaLengkap, alamat, nomorTelepon, email, jenisKelamin);
-        this.membershipInfo = new MembershipInfo(kodeAnggota, tanggalGabung, statusAktif, tingkatKeanggotaan);
-        this.activityStats = new ActivityStats(jumlahBukuDipinjam, jumlahTerlambat, jumlahDenda, poinLoyalitas);
-        this.memberPreferences = new MemberPreferences(kodeReferal, langgananBuletin);
+    public static class Builder {
+        private PersonalInfo personalInfo;
+        private MembershipInfo membershipInfo;
+        private ActivityStats activityStats;
+        private MemberPreferences memberPreferences;
+
+        public Builder personalInfo(String nama, String alamat, String telp, String email, String gender) {
+            this.personalInfo = new PersonalInfo(nama, alamat, telp, email, gender);
+            return this;
+        }
+
+        public Builder membershipInfo(String kode, Date gabung, boolean aktif, String tingkat) {
+            this.membershipInfo = new MembershipInfo(kode, gabung, aktif, tingkat);
+            return this;
+        }
+
+        public Builder activityStats(int buku, int terlambat, int denda, int poin) {
+            this.activityStats = new ActivityStats(buku, terlambat, denda, poin);
+            return this;
+        }
+
+        public Builder memberPreferences(String referal, boolean buletin) {
+            this.memberPreferences = new MemberPreferences(referal, buletin);
+            return this;
+        }
+
+        public LibraryMember build() {
+            return new LibraryMember(this);
+        }
     }
 
     public void cetakProfilLengkap() {
@@ -103,12 +129,9 @@ public class LibraryMember {
         double skor = 0;
         skor += activityStats.jumlahTerlambat * 1.5;
         skor += activityStats.jumlahDenda * 0.1;
-        if (!membershipInfo.statusAktif)
-            skor += 5;
-        if (membershipInfo.tingkatKeanggotaan.equals("DASAR"))
-            skor += 2;
-        if (activityStats.jumlahBukuDipinjam > 50)
-            skor -= 1.5;
+        if (!membershipInfo.statusAktif) skor += 5;
+        if (membershipInfo.tingkatKeanggotaan.equals("DASAR")) skor += 2;
+        if (activityStats.jumlahBukuDipinjam > 50) skor -= 1.5;
         return skor;
     }
 }
